@@ -1,27 +1,32 @@
 ﻿using Demo.Domain.DTOs;
 using Demo.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace Demo.Domain.Services
 {
     public class AppointmentService : IAppointmentService
     {
-        private readonly IClinicRepository _clinicRepository;
+        public IClinicRepository ClinicRepository { get; }
+        public ILogger<AppointmentService> Logger;
 
-        public AppointmentService(IClinicRepository clinicRepository)
+        public AppointmentService(
+            IClinicRepository clinicRepository,
+            ILogger<AppointmentService> logger)
         {
-            _clinicRepository = clinicRepository ?? throw new ArgumentNullException(nameof(clinicRepository));
+            ClinicRepository = clinicRepository ?? throw new ArgumentNullException(nameof(clinicRepository));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public bool Schedule(ScheduleRequest request)
         {
-            if (request.Cpf.Length != 11)
+            if (string.IsNullOrWhiteSpace(request.Cpf) || request.Cpf.Length != 11)
                 return false;
 
-            if (_clinicRepository.IsOpenAt(request.Date) is false)
+            if (ClinicRepository.IsOpenAt(request.Date) is false)
                 return false;
 
-            return _clinicRepository.Schedule(request.Cpf, request.Date);
+            return ClinicRepository.Schedule(request.Cpf, request.Date);
         }
     }
 }
