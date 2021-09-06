@@ -1,3 +1,4 @@
+using AutoFixture.Idioms;
 using Demo.Api.UnitTests.Attributes;
 using Demo.Domain.DTOs;
 using Demo.Domain.Services;
@@ -11,6 +12,14 @@ namespace Demo.Api.UnitTests
 {
     public class AppointmentServiceTests
     {
+        [Theory]
+        [AutoNSubstituteData]
+        public void Schedule_GuardClause(
+            GuardClauseAssertion assertion)
+        {
+            assertion.Verify(typeof(AppointmentService).GetConstructors());
+        }
+
         [Theory]
         [InlineAutoNSubstituteData(null)]
         [InlineAutoNSubstituteData("")]
